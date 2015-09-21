@@ -1,8 +1,8 @@
 package mlog
 
 import (
-	"mabetle/mlog/logapi"
-	"mabetle/mlog/wlog"
+	"github.com/mabetle/mlog/logapi"
+	"github.com/mabetle/mlog/wlog"
 )
 
 // GetLogger returns logapi.Logger

@@ -1,7 +1,7 @@
 package mlog
 
 import (
-	"mabetle/mlog/wlog"
+	"github.com/mabetle/mlog/wlog"
 )
 
 // Set logger catalogs level.
