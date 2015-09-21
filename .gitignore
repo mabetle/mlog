@@ -22,3 +22,14 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# temp files
+\#*
+.#*
+*~
+
+# go main out
+**/*_demo/*_demo
+**/*_task/*_task
+**/*_main/*_main
+
