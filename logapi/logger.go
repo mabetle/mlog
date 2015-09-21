@@ -26,3 +26,8 @@ type Logger interface {
 	// ouput log infomations
 	Inspect() // show log info
 }
+
+
+type LogWriter interface{
+	WriteLog(level string, catalog string, callin int, msg ...interface{})
+}

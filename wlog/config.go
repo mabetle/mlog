@@ -10,8 +10,12 @@ import (
 var ConfigLocation = "log.conf"
 
 func LoadAppenders(lines []string) {
-	var hasConsoleAppender, hasFileAppender bool
+	var hasConsoleAppender, hasFileAppender, hasDBAppender bool
+	
 	var fileAppendLocation string
+
+	var driver,spec string
+
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		// skip blank and comment line
@@ -37,6 +41,8 @@ func LoadAppenders(lines []string) {
 					hasConsoleAppender = true
 				case "file":
 					hasFileAppender = true
+				case "db":
+					hasDBAppender = true
 				default:
 				}
 			}
@@ -46,15 +52,31 @@ func LoadAppenders(lines []string) {
 		if key == "appender-file-location" {
 			fileAppendLocation = expandPath(value)
 		}
+
+		if key == "appender-db-driver" {
+			driver = value
+		}
+
+		if key == "appender-db-spec" {
+			spec = value
+		}
 	}
+
 	// init appender
+	// Add console appender
 	if hasConsoleAppender {
 		AddConsoleAppender()
 	}
-
+	
+	// add file appender
 	if hasFileAppender && fileAppendLocation != "" {
 		//fmt.Printf("fileAppendLocation: %s\n",fileAppendLocation )
 		AddFileAppender(fileAppendLocation)
+	}
+
+	// add db appender
+	if hasDBAppender && driver != "" && spec != "" {
+		AddDBAppender(driver,spec)
 	}
 }
 
