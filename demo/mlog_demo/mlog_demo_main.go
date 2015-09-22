@@ -13,7 +13,8 @@ var (
 )
 
 func Demo() {
-	//mlog.SetErrorLevel()
+	//mlog.SetInfoLevel()
+	mlog.SetErrorLevel()
 	//mlogApiLogger.Error("Hello")
 	mlogWrapLogger.Trace("Hello")
 	mlogWrapLogger.Debug("Hello")
@@ -21,7 +22,7 @@ func Demo() {
 	mlogWrapLogger.Error("Hello")
 	mlogWrapLogger.Warn("Hello")
 
-	mlogWrapLogger.Inspect()
+	//mlogWrapLogger.Inspect()
 
 	//wlogApiLogger.Error("Hello")
 	//wlogWrapLogger.Error("Hello")

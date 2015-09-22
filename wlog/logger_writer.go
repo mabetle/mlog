@@ -7,9 +7,8 @@ import (
 // GetCatalogLevel
 // if catalog level not matched, default to INFO
 // you can change it by mlog.SetLevel()
-func GetCatalogLevel(catalog string, levelMap map[string]Level) (l Level, ok bool) {
-	// default level is info.
-	for k, v := range levelMap {
+func GetCatalogLevel(catalog string, lm map[string]Level) (l Level, ok bool) {
+	for k, v := range lm {
 		if len(k) > len(catalog) {
 			continue
 		}
@@ -24,12 +23,12 @@ func GetCatalogLevel(catalog string, levelMap map[string]Level) (l Level, ok boo
 
 // WriteLog
 // all log methods call this one.
-func WriteLog(level, catalog string, callin int, args ...interface{}) {
+func WriteLog(levelLabel, catalog string, callin int, args ...interface{}) {
 	appenders := GetAppenders()
 	for _, appender := range appenders {
-		if !appender.IsOutputLog(catalog, level) {
+		if !appender.IsOutputLog(levelLabel, catalog) {
 			continue
 		}
-		appender.WriteLog(level, catalog, callin, args...)
+		appender.WriteLog(levelLabel, catalog, callin, args...)
 	}
 }

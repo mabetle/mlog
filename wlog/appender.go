@@ -106,16 +106,19 @@ func (a *BaseAppender) IsOutputLog(levelLabel, catalog string) bool {
 	level := GetStringLevel(levelLabel)
 	appenderCatalogLevel, aok := GetCatalogLevel(catalog, a.GetLevelMap())
 	catalogLevel, ok := GetCatalogLevel(catalog, levelMap)
+	
+	fmt.Printf("***LogLevel:%s, Appender Level: %v, %v CommonLevel: %v, %v \n", levelLabel, appenderCatalogLevel, aok, catalogLevel, ok)
+	
 	// 1.check appender config
-	if aok && appenderCatalogLevel <= level {
+	if aok && appenderCatalogLevel >= level {
 		return true
 	}
 	// 2.check common level config
-	if ok && catalogLevel <= level {
+	if ok && catalogLevel >= level {
 		return true
 	}
 	// 3.not found in config map
-	if LevelInfo <= level {
+	if LevelInfo >= level {
 		return true
 	}
 	// 4. less than INFO
