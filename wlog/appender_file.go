@@ -10,16 +10,14 @@ import (
 var fileLogger = log.New(ioutil.Discard, "", LogFormat)
 
 type FileAppender struct {
+	*BaseAppender
 	Location string
 }
 
 func NewFileAppender(location string) *FileAppender {
-	return &FileAppender{Location: location}
-}
-
-// AddFileAppender
-func AddFileAppender(location string) {
-	AddAppender("File", NewFileAppender(location))
+	m := &FileAppender{Location: location}
+	m.BaseAppender = NewBaseAppender("file")
+	return m
 }
 
 // WriteLog implements Appender
@@ -40,4 +38,17 @@ func getFileLogger(fa *FileAppender) *log.Logger {
 	}
 	fileLogger.SetOutput(w)
 	return fileLogger
+}
+
+// ScanAddFileAppender
+func ScanAddFileAppender(lines []string) {
+	if !IsHasAppender("file", lines) {
+		return
+	}
+	fileAppendLocation, _ := ScanConfigValue("appender-file-location", lines)
+	// add file appender
+	if fileAppendLocation != "" {
+		//fmt.Printf("fileAppendLocation: %s\n",fileAppendLocation )
+		AddAppender(NewFileAppender(fileAppendLocation), lines)
+	}
 }

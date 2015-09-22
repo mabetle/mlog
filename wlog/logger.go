@@ -78,9 +78,3 @@ func (l WrapLogger) LoadConfig(location string) {
 func (l WrapLogger) SetLevel(level string, catalog ...string) {
 	SetLevel(level, catalog...)
 }
-
-// AddAppender
-// Appender is a interface, any implements WriteLog() can be added.
-func (l WrapLogger) AddAppender(name string, appender Appender) {
-	AddAppender(name, appender)
-}

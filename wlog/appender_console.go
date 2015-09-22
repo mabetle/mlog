@@ -9,10 +9,14 @@ import (
 var consoleLogger = log.New(os.Stdout, "", LogFormat)
 
 type ConsoleAppender struct {
+	*BaseAppender
 }
 
-func NewConsoleAppender() Appender {
-	return &ConsoleAppender{}
+// NewConsoleAppender
+func NewConsoleAppender() *ConsoleAppender {
+	m := &ConsoleAppender{}
+	m.BaseAppender = NewBaseAppender("console")
+	return m
 }
 
 // WriteLog implements Appender
@@ -24,7 +28,9 @@ func (a ConsoleAppender) WriteLog(level string, catalog string, callin int, v ..
 	consoleLogger.Output(callin, msg)
 }
 
-// AddConsoleAppender
-func AddConsoleAppender() {
-	AddAppender("Console", NewConsoleAppender())
+func ScanAddConsoleAppender(lines []string) {
+	if !IsHasAppender("console", lines) {
+		return
+	}
+	AddAppender(NewConsoleAppender(), lines)
 }

@@ -15,6 +15,7 @@ const (
 )
 
 var levelMap = make(map[string]Level)
+
 var levelLabelMap = make(map[Level]string)
 var labelLevelMap = make(map[string]Level)
 
@@ -65,6 +66,9 @@ func SetCatalogsLevel(level Level, catalogs ...string) {
 	}
 
 	for _, catalog := range catalogs {
+		if catalog == "root" {
+			catalog = ""
+		}
 		levelMap[catalog] = level
 	}
 }

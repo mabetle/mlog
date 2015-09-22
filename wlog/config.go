@@ -9,13 +9,33 @@ import (
 // Default config location.
 var ConfigLocation = "log.conf"
 
+// LoadAppenders
 func LoadAppenders(lines []string) {
-	var hasConsoleAppender, hasFileAppender, hasDBAppender bool
-	
-	var fileAppendLocation string
+	ScanAddConsoleAppender(lines)
+	ScanAddFileAppender(lines)
+	ScanAddDBAppender(lines)
+}
 
-	var driver,spec string
+// IsHasAppender
+func IsHasAppender(name string, lines []string) bool {
+	name = strings.ToLower(name)
+	value, ok := ScanConfigValue("appender", lines)
+	if !ok {
+		return false
+	}
+	aS := strings.Split(value, ",")
+	for _, a := range aS {
+		a = strings.TrimSpace(a)
+		a = strings.ToLower(a)
+		if a == name {
+			return true
+		}
+	}
+	return false
+}
 
+// ScanConfigValue
+func ScanConfigValue(scanKey string, lines []string) (string, bool) {
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		// skip blank and comment line
@@ -30,54 +50,12 @@ func LoadAppenders(lines []string) {
 		key := strings.TrimSpace(lineA[0])
 		key = strings.ToLower(key)
 		value := strings.TrimSpace(lineA[1])
-		// process appender key
-		if key == "appender" {
-			aS := strings.Split(value, ",")
-			for _, a := range aS {
-				a = strings.TrimSpace(a)
-				a = strings.ToLower(a)
-				switch a {
-				case "console":
-					hasConsoleAppender = true
-				case "file":
-					hasFileAppender = true
-				case "db":
-					hasDBAppender = true
-				default:
-				}
-			}
-
-		}
 		// process append-file-location key
-		if key == "appender-file-location" {
-			fileAppendLocation = expandPath(value)
-		}
-
-		if key == "appender-db-driver" {
-			driver = value
-		}
-
-		if key == "appender-db-spec" {
-			spec = value
+		if key == scanKey {
+			return value, true
 		}
 	}
-
-	// init appender
-	// Add console appender
-	if hasConsoleAppender {
-		AddConsoleAppender()
-	}
-	
-	// add file appender
-	if hasFileAppender && fileAppendLocation != "" {
-		//fmt.Printf("fileAppendLocation: %s\n",fileAppendLocation )
-		AddFileAppender(fileAppendLocation)
-	}
-
-	// add db appender
-	if hasDBAppender && driver != "" && spec != "" {
-		AddDBAppender(driver,spec)
-	}
+	return "", false
 }
 
 // LoadConfig try to read config file.
@@ -91,6 +69,7 @@ func LoadConfig(location string) error {
 	lines := strings.Split(string(bs), "\n")
 
 	LoadAppenders(lines)
+
 	LoadConfigLevels(lines)
 
 	return nil
