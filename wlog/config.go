@@ -70,38 +70,7 @@ func LoadConfig(location string) error {
 
 	LoadAppenders(lines)
 
-	LoadConfigLevels(lines)
-
 	return nil
-}
-
-// LoadConfigLevels
-func LoadConfigLevels(lines []string) {
-	// process catelog level config
-	levelPrefix := "level-"
-
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		// skip blank line and comment line
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-
-		// skip not start with level-
-		if !strings.HasPrefix(line, levelPrefix) {
-			continue
-		}
-
-		kv := strings.Split(line, "=")
-
-		if len(kv) != 2 {
-			continue
-		}
-
-		catalog := strings.TrimPrefix(kv[0], levelPrefix)
-		level := kv[1]
-		SetLevel(level, catalog)
-	}
 }
 
 // LoadDefaultConfig loads logger configuations.

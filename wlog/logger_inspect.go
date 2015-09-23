@@ -15,7 +15,7 @@ func InspectLogger(logger *WrapLogger) {
 
 	fmt.Printf("\nCatalog: %s\n", logger.Catalog)
 
-	for _, a := range Appenders {
+	for _, a := range GetAppenders() {
 		a.Inspect(logger.Catalog)
 	}
 }

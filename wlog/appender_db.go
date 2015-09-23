@@ -1,36 +1,17 @@
 package wlog
 
 import (
+	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/go-xorm/xorm"
 	"runtime"
 	"sync"
 	"time"
 )
 
-// store in database
-type LogTable struct {
-	Id         int64  ``
-	Level      string `xorm:"varchar(10)"`
-	Source     string `xorm:"varchr(500)"`
-	Line       int
-	Catalog    string    `xorm:"varchar(500)"`
-	Message    string    `xorm:"varchar(1000)"`
-	CreateTime time.Time `xorm:"created"`
-}
-
-// You can change it outside
-var DB_LOG_TABLE = "common_wlog"
-
-// TableName
-func (m LogTable) TableName() string {
-	return DB_LOG_TABLE
-}
-
 type DBAppender struct {
-	mu   sync.Mutex // ensures atomic writes; protects the following fields
-	Xorm *xorm.Engine
+	mu  sync.Mutex // ensures atomic writes; protects the following fields
+	Sql *sql.DB
 	*BaseAppender
 }
 
@@ -39,29 +20,59 @@ func NewDBAppender(driver, spec, table string) (*DBAppender, error) {
 	if table == "" {
 		table = "common_wlog"
 	}
-
 	DB_LOG_TABLE = table
-
 	m := &DBAppender{}
-
-	e, err := xorm.NewEngine(driver, spec)
-
+	db, err := sql.Open(driver, spec)
 	if err != nil {
+		fmt.Printf("Error Open DB: %v", err)
 		return nil, err
 	}
-	// Sync Table
-	e.Sync(LogTable{})
 
-	m.Xorm = e
+	if err := Sync(db, LogTable{}); err != nil {
+		// not show exists message.
+		//fmt.Printf("Sync LogTable error: %s\n", err)
+	}
 
+	m.Sql = db
 	m.BaseAppender = NewBaseAppender("db")
-
 	return m, nil
+}
+
+func Sync(db *sql.DB, model LogTable) error {
+	q := `
+CREATE TABLE %s (
+  Id bigint(20) NOT NULL AUTO_INCREMENT,
+  Level varchar(10) DEFAULT NULL,
+  Source varchar(255) DEFAULT NULL,
+  Line int(11) DEFAULT NULL,
+  Catalog varchar(500) DEFAULT NULL,
+  Message varchar(1000) DEFAULT NULL,
+  CreateTime datetime DEFAULT NULL,
+  PRIMARY KEY (Id)
+)`
+	//ENGINE=InnoDB AUTO_INCREMENT=230 DEFAULT CHARSET=utf8
+	q = fmt.Sprintf(q, DB_LOG_TABLE)
+	if _, err := db.Exec(q); err != nil {
+		return err
+	}
+	return nil
+}
+
+func Insert(db *sql.DB, model LogTable) error {
+	q := `
+INSERT INTO %s (Level,Source,Line,Catalog,Message,CreateTime) 
+VALUES (?,?,?,?,?,?)
+`
+	q = fmt.Sprintf(q, DB_LOG_TABLE)
+	if _, err := db.Exec(q, model.Level, model.Source, model.Line,
+		model.Catalog, model.Message, model.CreateTime); err != nil {
+		return err
+	}
+	return nil
 }
 
 // WriteLog implements for api.LogWriter
 func (a *DBAppender) WriteLog(level string, catalog string, callin int, v ...interface{}) {
-
 	// arg call in not used.
 	callin = 3
 	a.mu.Lock()
@@ -69,7 +80,7 @@ func (a *DBAppender) WriteLog(level string, catalog string, callin int, v ...int
 	m.Level = level
 	m.Catalog = catalog
 	m.Message = fmt.Sprint(v...)
-	//m.CreateTime = time.Now()
+	m.CreateTime = time.Now()
 
 	_, file, line, ok := runtime.Caller(callin)
 	if !ok {
@@ -81,20 +92,16 @@ func (a *DBAppender) WriteLog(level string, catalog string, callin int, v ...int
 	m.Line = line
 
 	// do save
-	_, err := a.Xorm.Insert(&m)
-
-	a.mu.Unlock()
-
-	if err != nil {
+	if err := Insert(a.Sql, m); err != nil {
 		fmt.Printf("Write Logger to DB Error: %v\n", err)
 	}
+
+	a.mu.Unlock()
 }
 
 // AddDBAppender
 func AddDBAppender(driver, spec string, table string, lines []string) {
-
 	a, err := NewDBAppender(driver, spec, table)
-
 	if err != nil {
 		fmt.Printf("Error db appender: %v\n", err)
 		return

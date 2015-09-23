@@ -15,10 +15,13 @@ Ideas from log4j.
 	
 	go get -v github.com/mabetle/mlog
 
+## Dependencies
+
+Only depends on Go, no third part lib needed.
 
 ## Usage
 
-In Go code:
+### In Go code:
 
 	import "github.com/mabetle/mlog"
 	
@@ -36,6 +39,41 @@ In Go code:
 		logger.Infof("info %s", info)
 	}
 
+### Without configuration file, Init Logger in Go code:
+
+	func init(){
+		mlog.AddAppender(...)
+		mlog.SetLevel(...)
+	}
+
+	var logger = mlog.GetLogger("xxx")
+
+### Specific custom log config location:
+
+	mlog.LoadConfig( location )
+
+## Write Myself Appender
+
+Appender interface define:
+
+	type Appender interface {
+		// BaseAppender vars
+		GetName() string
+
+		// BaseAppender has implements these.
+		SetLevel(level string, catalogs ...string)
+		ScanConfigLevel(lines []string)
+		IsOutputLog(level, catalog string) bool
+		Inspect(catalog string)
+
+		// each appender should implements WriteLog()
+		WriteLog(level string, catalog string, callin int, msg ...interface{})
+	}
+
+Your Appender implements can extends BaseAppender, BaseAppender provides all methods 
+except WriteLog(...). You should write you own WriteLog method.
+
+
 ## Configuration
 
 Mlog using log.conf to config logger runtime environment.
@@ -47,7 +85,7 @@ Search log.conf in following sequence:
 * /conf/log.conf
 * /rundata/log.conf
 
-Logger config file format reference: [log_tml.conf](log_tml.conf)
+Logger config file format reference: [misc/log_tml.conf](log_tml.conf)
 
 ## Known Bugs
 
