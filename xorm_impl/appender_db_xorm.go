@@ -3,10 +3,12 @@ package xorm_impl
 import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/mabetle/mlog/wlog"
 	"runtime"
 	"sync"
+	"time"
 )
 
 type XormDBAppender struct {
@@ -26,10 +28,14 @@ func NewXormDBAppender(driver, spec, table string) (*XormDBAppender, error) {
 	m := &XormDBAppender{}
 
 	e, err := xorm.NewEngine(driver, spec)
-
 	if err != nil {
 		return nil, err
 	}
+
+	// config Engine
+	e.SetTableMapper(core.SnakeMapper{})
+	e.SetColumnMapper(core.SameMapper{})
+
 	// Sync Table
 	e.Sync(wlog.LogTable{})
 
@@ -50,7 +56,7 @@ func (a *XormDBAppender) WriteLog(level string, catalog string, callin int, v ..
 	m.Level = level
 	m.Catalog = catalog
 	m.Message = fmt.Sprint(v...)
-	//m.CreateTime = time.Now()
+	m.CreateTime = time.Now()
 
 	_, file, line, ok := runtime.Caller(callin)
 	if !ok {
