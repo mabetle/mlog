@@ -65,7 +65,7 @@ func LoadConfig(location string) error {
 		// file not found
 		return err
 	}
-
+	fmt.Printf("Init logger form: %s\n", location)
 	lines := strings.Split(string(bs), "\n")
 
 	LoadAppenders(lines)
@@ -78,37 +78,25 @@ func LoadConfig(location string) error {
 // - ConfigLocation specification
 // - log.conf
 // - conf/log.conf
-// - /rundata/log.conf
-// - /conf/common/log.conf
+// - /etc/mlog/log.conf
 func InitConfig() {
 	// Load config from ConfigLoaction
 	if LoadConfig(ConfigLocation) == nil {
-		fmt.Printf("Init logger form: %s\n", ConfigLocation)
 		return
 	}
 
 	// Load config from current dir
 	if LoadConfig("log.conf") == nil {
-		fmt.Printf("Init logger form: %s\n", "log.conf")
 		return
 	}
 
 	// Load config from conf dir
 	if LoadConfig("conf/log.conf") == nil {
-		fmt.Printf("Init logger form: %s\n", "conf/log.conf")
 		return
 	}
 
-	// Load config from /rundata dir
-	if LoadConfig("/rundata/log.conf") == nil {
-		fmt.Printf("Init logger form: %s\n", "/rundata/log.conf")
+	// Load config from /etc
+	if LoadConfig("/etc/mlog/log.conf") == nil {
 		return
 	}
-
-	// Load config from /conf dir
-	if LoadConfig("/conf/common/log.conf") == nil {
-		fmt.Printf("Init logger form: %s\n", "/conf/log.conf")
-		return
-	}
-
 }
