@@ -5,17 +5,17 @@ import (
 	"github.com/mabetle/mlog/wlog"
 )
 
-// GetLogger returns logapi.Logger
+// GetLogger returns wlog.WrapLogger
 func GetLogger(catalog string) *wlog.WrapLogger {
 	return wlog.NewWrapLogger(catalog, 5)
 }
 
-// GetWrapLogger
+// GetWrapLogger returns wlog.WrapLogger
 func GetWrapLogger(catalog string) *wlog.WrapLogger {
 	return wlog.NewWrapLogger(catalog, 5)
 }
 
-// GetApiLogger
+// GetApiLogger valid wlog implements Logger API
 func GetApiLogger(catalog string) logapi.Logger {
 	return wlog.NewLogger(catalog, 5)
 }
