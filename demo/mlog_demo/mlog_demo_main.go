@@ -27,8 +27,8 @@ func Demo() {
 
 func main() {
 	//mlog.SetTraceLevel()
-	//mlog.SetDebugLevel()
-	mlog.SetInfoLevel()
+	mlog.SetDebugLevel()
+	//mlog.SetInfoLevel()
 	//mlog.SetWarnLevel()
 	//mlog.SetErrorLevel()
 	Demo()
