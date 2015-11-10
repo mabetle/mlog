@@ -2,10 +2,10 @@ package wlog
 
 import (
 	"fmt"
+	"github.com/mabetle/mcore/mcon"
+	"github.com/mabetle/mcore/mterm"
 	"log"
 	"os"
-	"github.com/mabetle/mcore/mterm"
-	"github.com/mabetle/mcore/mcon"
 	"runtime"
 	"strings"
 	"time"
@@ -24,9 +24,9 @@ func NewConsoleAppender() *ConsoleAppender {
 	return m
 }
 
-func isWindows() bool{
-	goos:=strings.ToUpper(runtime.GOOS)
-	if strings.Contains(goos, "WINDOW"){
+func isWindows() bool {
+	goos := strings.ToUpper(runtime.GOOS)
+	if strings.Contains(goos, "WINDOW") {
 		return true
 	}
 	return false
@@ -35,12 +35,11 @@ func isWindows() bool{
 // WriteLog implements Appender
 // output example: [INFO] mabetle: message.
 func (a ConsoleAppender) WriteLog(level string, catalog string, callin int, v ...interface{}) {
-	if !mterm.IsXterm() && isWindows(){
+	if !mterm.IsXterm() && isWindows() {
 		// for win cmd
-		winCmdOut(level,catalog,callin,v...)
+		winCmdOut(level, catalog, callin, v...)
 		return
 	}
-
 	// xterm and others
 	logMsg := fmt.Sprint(v...)
 	msg := fmt.Sprintf("\n[%s] %s: %s", level, catalog, logMsg)
@@ -48,11 +47,10 @@ func (a ConsoleAppender) WriteLog(level string, catalog string, callin int, v ..
 	consoleLogger.Output(callin, msg)
 }
 
-func winCmdOut(level string, catalog string, callin int, v ...interface{}){
+func winCmdOut(level string, catalog string, callin int, v ...interface{}) {
 	level = strings.TrimSpace(level)
 	level = strings.ToUpper(level)
-
-	callin = 3
+	//callin = 3
 	msg := fmt.Sprint(v...)
 	createTime := time.Now()
 	_, file, line, ok := runtime.Caller(callin)
@@ -60,13 +58,13 @@ func winCmdOut(level string, catalog string, callin int, v ...interface{}){
 		file = "???"
 		line = 0
 	}
-	fmt.Fprintf(os.Stderr,"\n%v %s:%d", createTime, file, line )
+	fmt.Fprintf(os.Stderr, "%v %s:%d", createTime, file, line)
 
-	logMsg := fmt.Sprintf("\n[%s] %s: %s", level, catalog, msg)
+	logMsg := fmt.Sprintf("\n[%s] %s: %s\n", level, catalog, msg)
 
 	switch level {
 	case "TRACE":
-		mcon.PrintMagenta(logMsg)		
+		mcon.PrintMagenta(logMsg)
 	case "DEBUG":
 		mcon.PrintCyan(logMsg)
 	case "INFO":
