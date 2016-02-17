@@ -10,6 +10,10 @@ func GetLogger(catalog string) *wlog.WrapLogger {
 	return wlog.NewWrapLogger(catalog, 5)
 }
 
+func GetMainLogger() *wlog.WrapLogger {
+	return wlog.NewWrapLogger("main", 5)
+}
+
 // GetWrapLogger returns wlog.WrapLogger
 func GetWrapLogger(catalog string) *wlog.WrapLogger {
 	return wlog.NewWrapLogger(catalog, 5)
