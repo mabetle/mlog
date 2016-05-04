@@ -60,13 +60,27 @@ func (l WrapLogger) CheckNil(v interface{}) bool {
 
 // CheckError check error and log it.
 // if err not nil return true.
-func (l WrapLogger) CheckError(err error) bool {
+func (l WrapLogger) CheckError(err error, msg ...interface{}) bool {
 	if err != nil {
-		msg := fmt.Sprintf("Error: %v", err)
-		WriteLog("WARN", l.Catalog, l.Callin, msg)
+		errMsg := fmt.Sprintf("Error: %v", err)
+		WriteLog("WARN", l.Catalog, l.Callin, errMsg)
 		return true
 	}
+	// no error
+	if len(msg) != 0 {
+		okMsg := fmt.Sprint(msg...)
+		WriteLog("INFO", l.Catalog, l.Callin, okMsg)
+	}
+
 	return false
+}
+
+func (l WrapLogger) CheckErrorf(err error, msg string, args ...interface{}) bool {
+	okMsg := fmt.Sprintf(msg, args...)
+	if okMsg != "" {
+		return l.CheckError(err, okMsg)
+	}
+	return l.CheckError(err)
 }
 
 // LoadConfig

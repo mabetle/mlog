@@ -18,7 +18,8 @@ type Logger interface {
 	Errorf(format string, msg ...interface{})
 
 	// check error with log
-	CheckError(err error) bool
+	CheckError(err error, msg ...interface{}) bool
+	CheckErrorf(err error, msg string, args ...interface{}) bool
 
 	//  set catalog level
 	//SetLevel(level string, catalog ...string)
@@ -27,7 +28,6 @@ type Logger interface {
 	Inspect() // show log info
 }
 
-
-type LogWriter interface{
+type LogWriter interface {
 	WriteLog(level string, catalog string, callin int, msg ...interface{})
 }
