@@ -2,10 +2,11 @@ package wlog
 
 import (
 	"fmt"
+
 	"github.com/mabetle/mlog/logapi"
 )
 
-// WrapLogger
+// WrapLogger .
 type WrapLogger struct {
 	Catalog string
 	Callin  int
@@ -22,28 +23,42 @@ func NewLogger(catalog string, callin int) logapi.Logger {
 	return &WrapLogger{Catalog: catalog, Callin: callin}
 }
 
-func (l WrapLogger) Info(args ...interface{})  { WriteLog("INFO", l.Catalog, l.Callin, args...) }
-func (l WrapLogger) Warn(args ...interface{})  { WriteLog("WARN", l.Catalog, l.Callin, args...) }
+// Info .
+func (l WrapLogger) Info(args ...interface{}) { WriteLog("INFO", l.Catalog, l.Callin, args...) }
+
+// Warn .
+func (l WrapLogger) Warn(args ...interface{}) { WriteLog("WARN", l.Catalog, l.Callin, args...) }
+
+// Debug .
 func (l WrapLogger) Debug(args ...interface{}) { WriteLog("DEBUG", l.Catalog, l.Callin, args...) }
+
+// Error .
 func (l WrapLogger) Error(args ...interface{}) { WriteLog("ERROR", l.Catalog, l.Callin, args...) }
+
+// Trace .
 func (l WrapLogger) Trace(args ...interface{}) { WriteLog("TRACE", l.Catalog, l.Callin, args...) }
 
+// Infof .
 func (l WrapLogger) Infof(format string, args ...interface{}) {
 	WriteLog("INFO", l.Catalog, l.Callin, fmt.Sprintf(format, args...))
 }
 
+// Warnf .
 func (l WrapLogger) Warnf(format string, args ...interface{}) {
 	WriteLog("WARN", l.Catalog, l.Callin, fmt.Sprintf(format, args...))
 }
 
+// Debugf .
 func (l WrapLogger) Debugf(format string, args ...interface{}) {
 	WriteLog("DEBUG", l.Catalog, l.Callin, fmt.Sprintf(format, args...))
 }
 
+// Errorf .
 func (l WrapLogger) Errorf(format string, args ...interface{}) {
 	WriteLog("ERROR", l.Catalog, l.Callin, fmt.Sprintf(format, args...))
 }
 
+// Tracef .
 func (l WrapLogger) Tracef(format string, args ...interface{}) {
 	WriteLog("TRACE", l.Catalog, l.Callin, fmt.Sprintf(format, args...))
 }
@@ -61,20 +76,23 @@ func (l WrapLogger) CheckNil(v interface{}) bool {
 // CheckError check error and log it.
 // if err not nil return true.
 func (l WrapLogger) CheckError(err error, msg ...interface{}) bool {
+	okMsg := fmt.Sprint(msg...)
+
 	if err != nil {
-		errMsg := fmt.Sprintf("Error: %v", err)
+		errMsg := fmt.Sprintf("%s Error: %v", okMsg, err)
 		WriteLog("WARN", l.Catalog, l.Callin, errMsg)
 		return true
 	}
+
 	// no error
 	if len(msg) != 0 {
-		okMsg := fmt.Sprint(msg...)
 		WriteLog("INFO", l.Catalog, l.Callin, okMsg)
 	}
 
 	return false
 }
 
+// CheckErrorf check errors
 func (l WrapLogger) CheckErrorf(err error, msg string, args ...interface{}) bool {
 	okMsg := fmt.Sprintf(msg, args...)
 	if okMsg != "" {
@@ -83,12 +101,12 @@ func (l WrapLogger) CheckErrorf(err error, msg string, args ...interface{}) bool
 	return l.CheckError(err)
 }
 
-// LoadConfig
+// LoadConfig .
 func (l WrapLogger) LoadConfig(location string) {
 	LoadConfig(location)
 }
 
-// SetLevel
+// SetLevel .
 func (l WrapLogger) SetLevel(level string, catalog ...string) {
 	SetLevel(level, catalog...)
 }
